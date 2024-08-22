@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>theatre</title>
+    <style>
+        h2, h1 {
+            text-align: center;
+        }
+
+        .hall {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto;
+        }
+
+        .place {
+            padding: 10px 20px;
+            border: 3px solid black;
+            text-decoration: none;
+            font-size: 20px;
+            color: white;
+            background: #f700ff;
+            margin: 1px;
+        }
+    </style>
+</head>
+<body>
+<h2>THEATRE</h2>
+<h1>Romeo and Juliet</h1>
+
+<% let seatNumber = 1; %>
+<% let rowNumber = 1; %>
+<% for (var i = 0; i < 10; i++) { %>
+    <div class="hall">
+        <% for (var j = 0; j < 10; j++) { %>
+            <a href="#" class="place" id="<%= rowNumber %>/<%= seatNumber %>">
+                <%= rowNumber %>/<%= seatNumber++ %>
+            </a>
+        <% } %>
+        <% seatNumber = 1; rowNumber++; %>
+    </div>
+<% } %>
+
+<script>
+
+</script>
+
+</body>
+</html>
