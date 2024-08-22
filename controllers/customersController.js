@@ -14,7 +14,6 @@ export default {
             })
 
             const customerProfile =await models.getCustomer(row, seat)
-            console.log(customerProfile)
             res.json({
                 message: 'Successfully registered',
                 "Booking History":

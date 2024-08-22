@@ -10,7 +10,8 @@ export default (schema, target) => {
 
             if (hasErrors) {
                 res.status(422).json({ "errors": fields,"message":"Validation Failed" });
-                return
+
+                return fields
             }
         }
         next()
