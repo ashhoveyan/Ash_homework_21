@@ -43,7 +43,7 @@ export default {
             if (files.length > 0) {
                 files.forEach(filePath => {
                     try {
-                        fs.unlinkSync(`public/${filePath}`);
+                        fs.unlinkSync(`public/${files}`);
                     } catch (unlinkErr) {
                         console.error('Failed to delete file:', unlinkErr);
                     }
@@ -54,5 +54,50 @@ export default {
                 error: err.message,
             });
         }
-    }
+    },
+    getPosts: async (req, res) => {
+        try {
+
+            let page = +req.query.page;
+            let limit = +req.query.limit;
+            let offset = (page - 1) * limit;
+
+
+            const posts = await Posts.findAll({
+                attributes: ['id','description', 'createdAt'],
+                include: [
+                    {
+                        model: Users,
+                        attributes: ['id', 'email', 'username'],
+                        include: [
+                            {
+                                model: Media,
+                                as: 'avatar',
+                                attributes: ['path'],
+                            },
+                        ],
+                    },
+                    {
+                        model: Media,
+                        attributes: ['path', 'createdAt', 'postId'],
+                    },
+                ],
+                order: [['id', 'DESC']],
+                limit,
+                offset,
+            });
+            res.status(200).json({
+                message: 'Posts list',
+                page,
+                limit,
+                posts
+            });
+        } catch (error) {
+            console.error('Error fetching posts:', error);
+            return res.status(500).json({
+                message: 'Failed to fetch posts',
+                error: error.message,
+            });
+        }
+    },
 }

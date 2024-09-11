@@ -25,5 +25,6 @@ router.post(
     postsController.createPosts
 );
 
+router.get('/list/general',authenticate,postsController.getPosts)
 
 export default router;

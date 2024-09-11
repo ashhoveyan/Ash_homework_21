@@ -7,9 +7,14 @@ export default (schema, target) => {
         const fields = {};
         if (error) {
 
-            if (req.file){
-                fs.unlinkSync(req.file.path);
+            if (res.file) {
+                try {
+                    fs.unlinkSync(req.file.path);
+                } catch (unlinkErr) {
+                    console.error('File removal failed:', unlinkErr);
+                }
             }
+
 
             error.details.forEach(detail => {
                 fields[detail.path[0]] = detail.message;
@@ -17,7 +22,7 @@ export default (schema, target) => {
             const hasErrors = Object.keys(fields).length > 0;
 
             if (hasErrors) {
-                res.status(422).json({ "errors": fields,"message":"Validation Failed" });
+                res.status(422).json({ "errors": fields,"message":"Validation Failed!" });
 
                 return fields
             }

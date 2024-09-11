@@ -22,8 +22,12 @@ export default {
                 }
             });
             if (!created) {
-                if (avatarPath) {
-                    fs.unlinkSync(avatarPath);
+                if (req.file) {
+                    try {
+                        fs.unlinkSync(req.file.path);
+                    } catch (unlinkErr) {
+                        console.error('File removal failed:', unlinkErr);
+                    }
                 }
                 return res.status(409).json({
                     message: 'User already exists',
@@ -56,8 +60,12 @@ export default {
 
         }catch (error) {
             console.error('Registration Error:', error);
-            if (avatarPath) {
-                fs.unlinkSync(avatarPath);
+            if (req.file) {
+                try {
+                    fs.unlinkSync(req.file.path);
+                } catch (unlinkErr) {
+                    console.error('File removal failed:', unlinkErr);
+                }
             }
             return res.status(500).json({
                 message: 'registration failed',
