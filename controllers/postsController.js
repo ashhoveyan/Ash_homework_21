@@ -2,6 +2,7 @@ import Users from '../models/Users.js';
 import Media from "../models/Media.js";
 import Posts from "../models/Posts.js";
 import fs from "fs";
+import path from "path";
 
 export default {
     createPosts: async (req, res) => {
@@ -40,15 +41,16 @@ export default {
             });
         }catch(err) {
             console.error('Create Post Error:', err);
-            if (files.length > 0) {
-                files.forEach(filePath => {
+            if (req.files) {
+                req.files.forEach(file => {
                     try {
-                        fs.unlinkSync(`public/${files}`);
+                        fs.unlinkSync(path.resolve(file.path));
                     } catch (unlinkErr) {
                         console.error('Failed to delete file:', unlinkErr);
                     }
                 });
             }
+
             return res.status(500).json({
                 message: 'Failed to create post',
                 error: err.message,
@@ -57,11 +59,33 @@ export default {
     },
     getPosts: async (req, res) => {
         try {
-
+            const {id: userId} = req.user;
             let page = +req.query.page;
             let limit = +req.query.limit;
             let offset = (page - 1) * limit;
+            const totalPosts = Posts.count()
 
+            const maxPageCount = Math.ceil(totalPosts/limit);
+
+            const user = await Users.findByPk(userId);
+
+            if (!user) {
+                res.status(404).json({
+                    message: 'User not found',
+                    user: []
+                });
+
+                return;
+            }
+
+            if(page > maxPageCount) {
+                res.status(404).json({
+                    message: 'Posts does not found.',
+                    posts: []
+                });
+
+                return ;
+            }
 
             const posts = await Posts.findAll({
                 attributes: ['id','description', 'createdAt'],

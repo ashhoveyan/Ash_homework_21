@@ -1,5 +1,5 @@
 import fs from 'fs';
-
+import path from 'path';
 
 export default (schema, target) => {
     return (req, res, next) => {
@@ -7,11 +7,11 @@ export default (schema, target) => {
         const fields = {};
         if (error) {
 
-            if (res.file) {
+            if (res.file && req.file.path) {
                 try {
-                    fs.unlinkSync(req.file.path);
+                    fs.unlinkSync(path.resolve(req.file.path));
                 } catch (unlinkErr) {
-                    console.error('File removal failed:', unlinkErr);
+                    console.error('Failed to delete file:', unlinkErr);
                 }
             }
 
