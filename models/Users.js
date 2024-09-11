@@ -22,11 +22,10 @@ Users.init(
         username: {
             type: DataTypes.STRING,
             allowNull: false,
-            unique: true,
         },
         email: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: false,
         },
         password: {
             type: DataTypes.STRING,
@@ -43,10 +42,6 @@ Users.init(
             type: DataTypes.ENUM('user', 'admin'),
             allowNull: false,
             defaultValue: 'user',
-        },
-        avatar: {
-            type: DataTypes.STRING,
-            allowNull: true
         }
     },
     {

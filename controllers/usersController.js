@@ -1,15 +1,15 @@
-import md5 from 'md5';
-import jwt from 'jsonwebtoken';
-
 import Users from '../models/Users.js';
-import {Sequelize, where} from "sequelize";
-import sequelize from "../clients/sequelize.mysql.js";
+import Media from "../models/Media.js";
+
+import fs from "fs";
+import jwt from "jsonwebtoken";
+
 
 export default {
     registration:async (req, res) =>{
-        const avatar = req.file ? req.file.path : null;
+        const avatarPath = req.file ? req.file.path.replace('public/', '') : null;
         try{
-            console.log(req.files)
+            //console.log(req.files)
             const {username, email, password} = req.body;
 
 
@@ -18,29 +18,46 @@ export default {
                 defaults: {
                     username,
                     email:email.toLowerCase(),
-                    password,
-                    avatar,
+                    password
                 }
             });
             if (!created) {
-
-                if (avatar) {
-                    fs.unlinkSync(avatar);
+                if (avatarPath) {
+                    fs.unlinkSync(avatarPath);
                 }
-
                 return res.status(409).json({
                     message: 'User already exists',
                 });
-            } else {
+            }
+
+            if (avatarPath) {
+                await Media.create({
+                    userId:user.id,
+                    path:avatarPath
+                })
+            }
+
+
+
+            const result = await Users.findByPk(user.id, {
+                include: [
+                    {
+                        model: Media,
+                        as: 'avatar',
+                        attributes: ['path'],
+                    },
+                ],
+            });
+
                 return res.status(201).json({
                     message: 'User created successfully',
-                    user: user,
+                    user: result,
                 });
-            }
+
         }catch (error) {
             console.error('Registration Error:', error);
-            if (avatar) {
-                fs.unlinkSync(avatar);
+            if (avatarPath) {
+                fs.unlinkSync(avatarPath);
             }
             return res.status(500).json({
                 message: 'registration failed',
