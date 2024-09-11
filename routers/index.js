@@ -1,13 +1,13 @@
 import { Router } from 'express';
 
-import userRoutes from './usersRouters.js';
-
+import usersRoutes from './usersRouters.js';
+import postsRoutes from './postsRouters.js';
 
 const router = Router();
 
 
-router.use('/users', userRoutes);
-
+router.use('/users', usersRoutes);
+router.use('/posts', postsRoutes);
 
 
 
