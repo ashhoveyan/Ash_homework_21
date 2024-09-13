@@ -6,40 +6,45 @@ import path from "path";
 
 export default {
     createPosts: async (req, res) => {
+        if (!req?.files?.length) {
+            res.status(422).send({
+                message: 'Images are required.',
+            });
+            return
+        }
+
         const files = req.files ? req.files.map(file => file.path.replace('public/', '')) : [];
 
         try {
             const {description} = req.body;
-            const { id } = req.user;
+            const {id} = req.user;
 
             const post = await Posts.create({
                 description,
                 userId: id,
             });
 
+            const mediaEntries = files.map(filePath => ({
+                path: filePath,
+                postId: post.id,
+            }));
 
-            if (files.length > 0) {
-                const mediaEntries = files.map(filePath => ({
-                    path: filePath,
-                    postId: post.id,
-                }));
-
-                await Media.bulkCreate(mediaEntries);
-            }
+            await Media.bulkCreate(mediaEntries);
 
             const result = await Posts.findByPk(post.id, {
                 include: [
                     {
                         model: Media,
-                        attributes: ['path'],
+                        as: 'images',
+                        attributes: ['path', 'id'],
                     },
                 ],
             });
-            return res.status(201).json({
+            res.status(201).json({
                 message: 'Post created successfully',
                 post: result,
             });
-        }catch(err) {
+        } catch (err) {
             console.error('Create Post Error:', err);
             if (req.files) {
                 req.files.forEach(file => {
@@ -51,7 +56,7 @@ export default {
                 });
             }
 
-            return res.status(500).json({
+            res.status(500).json({
                 message: 'Failed to create post',
                 error: err.message,
             });
@@ -65,30 +70,18 @@ export default {
             let offset = (page - 1) * limit;
             const totalPosts = Posts.count()
 
-            const maxPageCount = Math.ceil(totalPosts/limit);
+            const maxPageCount = Math.ceil(totalPosts / limit);
 
-            const user = await Users.findByPk(userId);
-
-            if (!user) {
-                res.status(404).json({
-                    message: 'User not found',
-                    user: []
-                });
-
-                return;
-            }
-
-            if(page > maxPageCount) {
+            if (page > maxPageCount) {
                 res.status(404).json({
                     message: 'Posts does not found.',
                     posts: []
                 });
-
-                return ;
+                return;
             }
 
             const posts = await Posts.findAll({
-                attributes: ['id','description', 'createdAt'],
+                attributes: ['id', 'description', 'createdAt'],
                 include: [
                     {
                         model: Users,
@@ -106,7 +99,7 @@ export default {
                         attributes: ['path', 'createdAt', 'postId'],
                     },
                 ],
-                order: [['id', 'DESC']],
+                order: [['createdAt', 'DESC']],
                 limit,
                 offset,
             });

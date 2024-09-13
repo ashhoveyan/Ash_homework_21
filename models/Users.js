@@ -42,7 +42,14 @@ Users.init(
             type: DataTypes.ENUM('user', 'admin'),
             allowNull: false,
             defaultValue: 'user',
-        }
+        },
+        activationKey:{
+            type: DataTypes.STRING,
+        },
+        status: {
+            type: DataTypes.STRING,
+            defaultValue: 'pending',
+        },
     },
     {
         sequelize,

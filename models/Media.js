@@ -3,26 +3,28 @@ import { DataTypes, Model } from 'sequelize';
 import Users from "./Users.js";
 import Posts from "./Posts.js";
 
-class Media extends Model {}
+class Media extends Model {
+}
 
 Media.init(
     {
-        id:{
-                    type: DataTypes.BIGINT.UNSIGNED,
-                    allowNull: false,
-                    primaryKey: true,
-                    autoIncrement: true,
-                },
+        id: {
+            type: DataTypes.BIGINT.UNSIGNED,
+            allowNull: false,
+            primaryKey: true,
+            autoIncrement: true,
+        },
         path: {
             type: DataTypes.STRING,
         },
-        },
-{
+    },
+    {
 
-    sequelize,
-    timestamps: true,
-    modelName: 'media',
-    tableName: 'media',}
+        sequelize,
+        timestamps: true,
+        modelName: 'media',
+        tableName: 'media',
+    }
 )
 
 Users.hasMany(Media, {
@@ -38,6 +40,7 @@ Media.belongsTo(Users, {
 });
 Posts.hasMany(Media, {
     foreignKey: 'postId',
+    as: 'images',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
 });

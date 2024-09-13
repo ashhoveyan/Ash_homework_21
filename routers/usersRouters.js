@@ -8,11 +8,7 @@ import userSchema from '../schemas/usersSchema.js';
 
 import userController from '../controllers/usersController.js';
 
-
-
 const router = Router();
-
-
 
 //apis
 
@@ -21,6 +17,12 @@ router.post("/registration",
     validate(userSchema.registration,'body'),
     userController.registration
 );
+
+router.get('/activate',
+    validate(userSchema.activate,'query'),
+    userController.activate
+
+)
 
 router.post("/login", validate(userSchema.login,'body'),  userController.login);
 
