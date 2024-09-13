@@ -15,11 +15,14 @@ const router = Router();
 router.post(
     '/create',
     fileUpload.array('images', 5),
-    validate(postsSchema.createPost, 'body'),
     authenticate,
+    validate(postsSchema.createPost, 'body'),
     postsController.createPosts
 );
 
-router.get('/list/general', authenticate, postsController.getPosts)
+router.get('/list/general',
+    authenticate,
+    validate(postsSchema.getPosts, 'query'),
+    postsController.getPosts)
 
 export default router;

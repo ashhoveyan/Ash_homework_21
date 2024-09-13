@@ -62,6 +62,7 @@ export default {
             });
         }
     },
+
     getPosts: async (req, res) => {
         try {
             const {id: userId} = req.user;
@@ -117,4 +118,5 @@ export default {
             });
         }
     },
+
 }
