@@ -40,4 +40,8 @@ router.put('/password/update',
     userController.updatePassword
 );
 
+router.get('/statistics',
+    userController.usersList
+    )
+
 export default router;

@@ -119,4 +119,42 @@ export default {
         }
     },
 
+    updatePost: async (req, res) => {},
+
+    deletePost: async (req, res) => {
+        try {
+            const {id} = req.user;
+            if (!id){
+                res.status(400).send({
+                    message: 'User.\'s ID is required ',
+                })
+                return;
+            }
+
+            const post = await Posts.findByPk(id)
+
+            if(!post){
+                res.status(404).send({
+                    message: '"Post not found."',
+                })
+                return;
+            }
+
+            const postsImages = await Media.findAll({where: {postId:id}});
+
+            // if (postsImages.length > 0) {
+            //     for (const media of postsImages) {
+            //         await (media.filePath);
+            //     }
+            await Media.destroy({where: {postId: id}});
+            await post.destroy();
+
+            res.status(200).json({
+                message: 'Post and associated media deleted successfully.'
+            });
+        }catch (error) {
+                console.error("Error deleting post:", error);
+                res.status(500).json({ message: "An error occurred while deleting the post." });
+            }
+    },
 }

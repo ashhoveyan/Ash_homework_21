@@ -15,12 +15,11 @@ const transporter = nodemailer.createTransport({
     host: 'smtp.ethereal.email',
     port: 587,
     auth: {
-        user: 'scotty7@ethereal.email',
-        pass: 'VRJPWhBQ9tvUQ6ZfDq'
+        user: 'carley3@ethereal.email',
+        pass: 'kVUbQR9YTU4BkbMp5c'
     }
 });
-
-export const sendMail = async ({to, subject, templateData, template}) => {
+export const sendMail = async ({to, subject, templateData, template,attachments=null}) => {
     try {
         const templatePath = path.resolve('./views/email/',`${template}.ejs`);
         const htmlData = await ejs.renderFile(templatePath,templateData)
@@ -32,6 +31,9 @@ export const sendMail = async ({to, subject, templateData, template}) => {
             html:htmlData,
         }
 
+        if (attachments){
+            mailOptions.attachments = attachments;
+        }
         const info = await transporter.sendMail(mailOptions)
 
         console.log(`Mail sent: ${info.response}`);

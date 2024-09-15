@@ -1,5 +1,5 @@
 import {v4 as uuid} from 'uuid';
-import fs from "fs";
+import fs from "fs/promises";
 
 import Users from '../models/Users.js';
 import Media from "../models/Media.js";
@@ -7,6 +7,8 @@ import Media from "../models/Media.js";
 import jwt from "jsonwebtoken";
 
 import {sendMail} from "../services/Mail.js";
+import {createXlsx} from "../services/Xlsx.js";
+import path from "path";
 
 const {SECRET_FOR_RECOVERY} = process.env;
 
@@ -292,6 +294,37 @@ export default {
                 message: 'Internal server error',
                 error: error.message,
             });
+        }
+    },
+
+    usersList: async (req, res) => {
+        try {
+            const usersList = await Users.findAll({raw: true});
+
+            const filename =  `user-${Date.now()}.xlsx`;
+            const fullPath =   `./public/xlsx/${filename}`;
+
+            createXlsx(usersList, fullPath);
+
+            await sendMail({
+                to: 'ash.hoveyan.02@mail.ru',
+                subject:'Users statistic xlsx file',
+                template:'statistic',
+                templateData: {},
+                attachments:[
+                    {
+                        filename,
+                        path:path.resolve(fullPath)
+                    }
+                ]
+            })
+
+            await fs.unlink(path.resolve(fullPath));
+            return res.status(200).json({
+                message:'Sucessfully'
+            })
+        }catch (e){
+            console.log(e)
         }
     }
 
